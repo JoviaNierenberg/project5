@@ -1,3 +1,5 @@
+![BuildStatus](https://github.com/JoviaNierenberg/project5/actions/workflows/test.yml/badge.svg?event=push)
+
 # Project 5
 Implementation of KMeans and Silhouette Scoring
 
