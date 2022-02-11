@@ -23,6 +23,10 @@ class KMeans:
         self.metric = metric
         self.tol = tol
         self.max_iter = max_iter
+
+        # model should not run if k<=0
+        if self.k<=0:
+            raise ValueError("k must be greater than zero")
     
     def fit(self, mat: np.ndarray):
         """
@@ -33,6 +37,10 @@ class KMeans:
                 A 2D matrix where the rows are observations and columns are features
         """
         
+        # model should not run if k > number of observations
+        if self.k > np.shape(mat)[0]:
+            raise ValueError("k must be less than the number of observations in the array")
+
         # create random centers
         centers = np.random.uniform(np.min(mat), np.max(mat), size=(self.k,2))
         
