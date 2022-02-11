@@ -6,7 +6,7 @@ requires = [
 build-backend = "flit_core.buildapi"
 
 [project]
-name = 'example_pip_installable_tool'
+name = 'kmeans_and_silhouette'
 authors = [{
 	name = 'Some Developer',
 	email = 'yellatme@somewhere.net'
