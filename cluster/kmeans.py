@@ -48,7 +48,7 @@ class KMeans:
         i=1
         mse=1
         mse_diff=1
-        self.mat = mat
+        self.mat = mat # necessary to access mat in get_centroids
         
         # iteratively select new centers
         while i<self.max_iter and mse_diff>self.tol:  
@@ -67,9 +67,7 @@ class KMeans:
             
             # increment
             i+=1
-        
-        # store labels and final mse
-        self.mse = mse
+
         
     def predict(self, mat: np.ndarray) -> np.ndarray:
         """
