@@ -42,34 +42,33 @@ class KMeans:
             raise ValueError("k must be less than the number of observations in the array")
 
         # create random centers
-        centers = np.random.uniform(np.min(mat), np.max(mat), size=(self.k,2))
+        self.centers = np.random.uniform(np.min(mat), np.max(mat), size=(self.k,2))
         
         # set baseline values
         i=1
         mse=1
         mse_diff=1
+        self.mat = mat
         
         # iteratively select new centers
         while i<self.max_iter and mse_diff>self.tol:  
             # assign points to each cluster based on their distance to the centers
-            dist_mat = cdist(mat, centers, metric=self.metric) # calculate distances from each point to each center, using supplied metric
-            calc_labels = np.argmin(dist_mat, axis=1) # find index of minmum value in each row
+            self.dist_mat = self._calc_distances(mat, self.centers)
+            self.labels = self.predict(mat)
             
             # calculate error - calculate squared distance from each point to its corresponding centroid, 
             # using the supplied metric, then take the mean of those values
             old_mse = mse
-            mse = np.mean(np.square(np.choose(calc_labels, dist_mat.T))) # numpy.choose which constructs an array from an index array - https://stackoverflow.com/questions/17074422/select-one-element-in-each-row-of-a-numpy-array-by-column-indices
+            mse = self.get_error()
             mse_diff = abs(old_mse-mse)
             
             # update centers based on cluster membership of datapoints
-            centers = np.array([mat[calc_labels==j].mean(0) for j in range(self.k)])
+            self.centers = self.get_centroids()
             
             # increment
             i+=1
         
-        # store centers, labels, and final mse
-        self.centers = centers
-        self.labels = calc_labels
+        # store labels and final mse
         self.mse = mse
         
     def predict(self, mat: np.ndarray) -> np.ndarray:
@@ -84,7 +83,7 @@ class KMeans:
             np.ndarray
                 a 1D array with the cluster label for each of the observations in `mat`
         """
-        return self.labels
+        return np.argmin(self.dist_mat, axis=1) # find index of minmum value in each row
 
     def get_error(self) -> float:
         """
@@ -94,7 +93,7 @@ class KMeans:
             float
                 the squared-mean error of the fit model
         """
-        return self.mse
+        return np.mean(np.square(np.choose(self.labels, self.dist_mat.T))) # numpy.choose which constructs an array from an index array - https://stackoverflow.com/questions/17074422/select-one-element-in-each-row-of-a-numpy-array-by-column-indices
 
     def get_centroids(self) -> np.ndarray:
         """
@@ -104,4 +103,11 @@ class KMeans:
             np.ndarray
                 a `k x m` 2D matrix representing the cluster centroids of the fit model
         """
-        return self.centers
+        return np.array([self.mat[self.labels==j].mean(0) for j in range(self.k)])
+
+    def _calc_distances(self, mat: np.ndarray, centers: np.ndarray) -> np.ndarray:
+        """
+        calculates the distance from each point to each center
+        """
+        return cdist(mat, centers, metric=self.metric)
+
